@@ -1,5 +1,4 @@
-from __future__ import annotations
-
+from datetime import datetime
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -48,6 +47,8 @@ def create_movement(
 @router.get("/inventory/movements", response_model=List[InventoryMovementResponse])
 def read_movements(
     ingredient_id: int | None = None,
+    start_date: datetime | None = None,
+    end_date: datetime | None = None,
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db),
@@ -56,6 +57,12 @@ def read_movements(
     query = db.query(InventoryMovement)
     if ingredient_id:
         query = query.filter(InventoryMovement.ingredient_id == ingredient_id)
+    
+    if start_date:
+        query = query.filter(InventoryMovement.created_at >= start_date)
+    
+    if end_date:
+        query = query.filter(InventoryMovement.created_at <= end_date)
     
     # Order by newest first
     query = query.order_by(desc(InventoryMovement.created_at))
