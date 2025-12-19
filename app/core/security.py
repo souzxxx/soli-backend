@@ -69,3 +69,12 @@ def admin_only(current_user: User = Depends(get_current_user)) -> User:
             detail="Admin privileges required",
         )
     return current_user
+
+
+def admin_or_operator(current_user: User = Depends(get_current_user)) -> User:
+    if current_user.role not in [RoleEnum.ADMIN, RoleEnum.OPERATOR]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin or Operator privileges required",
+        )
+    return current_user
