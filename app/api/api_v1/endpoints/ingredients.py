@@ -18,6 +18,17 @@ from app.schemas.ingredient import (
 router = APIRouter()
 
 
+# Endpoint PÚBLICO para a vitrine (sem autenticação)
+@router.get("/ingredients/public", response_model=List[IngredientResponse])
+def read_public_ingredients(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+):
+    """Lista ingredientes ativos para exibição pública na vitrine."""
+    return db.query(Ingredient).filter(Ingredient.active == True).offset(skip).limit(limit).all()
+
+
 @router.post(
     "/ingredients", response_model=IngredientResponse, status_code=status.HTTP_201_CREATED
 )
